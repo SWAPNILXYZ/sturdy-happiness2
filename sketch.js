@@ -1,77 +1,140 @@
-var helicopterIMG, helicopterSprite, packageSprite,packageIMG;
-var packageBody,ground
 const Engine = Matter.Engine;
-const World = Matter.World;
+const World= Matter.World;
 const Bodies = Matter.Bodies;
-const Body = Matter.Body;
-var engine,world;
-var box1;
+const Constraint = Matter.Constraint;
 
-function preload()
-{
-	helicopterIMG=loadImage("helicopter.png")
-	packageIMG=loadImage("package.png")
+var engine, world;
+var score = 0;
+var turn = 0;
+var particle;
+var gameState = "start";
+
+function preload(){
+
 }
 
 function setup() {
-	createCanvas(800, 700);
-	rectMode(CENTER);
+  createCanvas(800,800);
 
-	engine = Engine.create();
-	world = engine.world;
+  engine = Engine.create();
+    world = engine.world;
 
-	box1=new Box(500,600,15,100);
-	box2=new Box(300,600,15,100);
-	box3=new Box(400,600,200,15);
-
-    ground=new Ground(width/2,height-35,width,10);
-	packageSprite=createSprite(width/5, 80, 10,10);
-	packageSprite.addImage(packageIMG)
-	packageSprite.scale=0.2
-
-	helicopterSprite=createSprite(width/2, 200, 10,10);
-	helicopterSprite.addImage(helicopterIMG)
-	helicopterSprite.scale=0.6
-
-	//groundSprite=createSprite(width/2, height-35, width,10);
-	//groundSprite.shapeColor=color(255)
-
-	packageBody = Bodies.circle(width/2 , 200 , 20 , {restitution:.6, isStatic:true});
-	World.add(world, packageBody);
-	
-    
-	//Create a Ground
-	//ground = Bodies.rectangle(width/2, 650, width, 10 , {isStatic:true} );
- 	//World.add(world, ground);
-
-   
-	Engine.run(engine);
-	
+ground = new G(width/2,  height,width, 20);
+for (var k = 0; k <= width; k = k + 80){
+  divisions.push(new Divisions(k, height - divisionHeight/2, 10, divisionHeight));
+}
+for (var j = 75; j <= width; j = j + 50){
+  plinkos.push(new P(j, 75));
+}
+for (var j = 50; j <= width - 10; j = j + 50){
+  plinkos.push(new P(j, 175));
+}
+for (var j = 75; j <= width; j = j + 50){
+  plinkos.push(new P(j, 275));
+}
+for (var j = 50; j <= width - 10; j = j + 50){
+  plinkos.push(new P(j, 375));
 }
 
+}
+
+var divisionHeight = 300;
+var plinkos = [];
+var particles = [];
+var divisions = [];
 
 function draw() {
-  rectMode(CENTER);
-  background(0);
-  packageSprite.x= packageBody.position.x 
-  packageSprite.y= packageBody.position.y 
+  background(0); 
+  Engine.update(engine);
+  noStroke();
   
-  box1.display();
-  box2.display();
-  box3.display();
-  ground.display();
+  textSize(20);
+  fill("white");
+  text("Score: "+score, 650, 20);
+  
+for (var i = 0; i<plinkos.length; i++){
+  plinkos[i].display();
+}
+  for (var j = 0; j < particles.length; j++){
+    particles[j].display();
+  }
+  for (var k = 0; k < divisions.length; k++){
+    divisions[k].display();
+  }
 
-  drawSprites();
+  ground.display();
  
+  
+  if (particle!=null){
+    particle.display();
+
+    if (particle.body.position.y > 760){
+
+      if (particle.body.position.x < 300){
+        score = score + 500;
+        turn++; 
+        particle = null;
+       
+      }
+    }
+  }
+  if (particle!=null){
+    particle.display();
+
+    if (particle.body.position.y > 760){
+
+      if (particle.body.position.x > 301 && particle.body.position.x < 600){
+        score = score + 100;
+        turn++; 
+        particle = null;
+       
+      }
+    }
+  }
+  if (particle!=null){
+    particle.display();
+
+    if (particle.body.position.y > 760){
+
+      if (particle.body.position.x > 601 && particle.body.position.x < 900){
+        score = score + 200;
+        turn++; 
+        particle = null;
+        
+      }
+    }
+  }
+  if (gameState !== "end"){
+    text("place your mouse pointer to position the particle. Click space to make it fall", 50, 450);
+  }
+  if (turn >= 5){
+    gameState = "end";
+
+    if (gameState === "end"){
+      noStroke();
+      textSize(50);
+      fill("white");
+      text("GameOver", 300, 450);
+    }
+  }
+  textSize(25);
+  text("500", 20, 600);
+  text("500", 100, 600);
+  text("500", 180, 600);
+  text("500", 260, 600);
+  text("100", 340, 600);
+  text("100", 420, 600);
+  text("200", 500, 600);
+  text("200", 580, 600);
+  text("200", 660, 600);
+  text("200", 740, 600);
+  drawSprites();
 }
 
+function keyPressed(){
+  if (keyCode === 32 && gameState !== "end"){
 
-function keyPressed() {
- if (keyCode === DOWN_ARROW) {
-    Matter.Body.setStatic(packageBody,false);
-    
+  
+    particle = new Particles(mouseX, 10, 10, 10);
   }
 }
-
-
-
